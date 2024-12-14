@@ -8,7 +8,7 @@ public class Bullet : MonoBehaviour
     [SerializeField] private float speed;
     private TriggerDetector triggerDetector;
 
-    public UltEvent<Entity> damageEvent { get; private set; }
+    public UltEvent<Entity> damageEvent;
     private void Start()
     {
         triggerDetector = GetComponent<TriggerDetector>();
@@ -19,7 +19,7 @@ public class Bullet : MonoBehaviour
         {
             transform.Translate(Vector3.right * speed * Time.deltaTime);
 
-            if (Mathf.Abs(transform.position.x) > 10f)
+            if (Mathf.Abs(transform.position.x) > 7f)
             {
                 gameObject.SetActive(false);
             }
@@ -32,8 +32,11 @@ public class Bullet : MonoBehaviour
     }
     public void Damage()
     {
-        Entity target = triggerDetector.LastElementDetected.GetComponent<Entity>();
-        damageEvent.Invoke(target);
-        gameObject.SetActive(false);
+        Enemy target = triggerDetector.LastElementDetected.GetComponent<Enemy>();
+        if(target)
+        {
+            damageEvent.Invoke(target);
+            gameObject.SetActive(false);
+        }
     }
 }

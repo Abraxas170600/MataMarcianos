@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UltEvents;
 using UnityEngine;
 
-//[RequireComponent(typeof(Rigidbody2D))]
 public abstract class Entity : MonoBehaviour
 {
     [Header("Life")]
@@ -15,13 +14,14 @@ public abstract class Entity : MonoBehaviour
     [SerializeField] private UltEvent deathEvent;
 
     [Header("Attributes")]
-    [SerializeField] protected int damage;
+    [SerializeField] private int entityDamage;
     [SerializeField] protected float speed;
     protected bool isDeath;
 
     [Header("Dependences")]
     protected Animator entityAnimator;
 
+    public int EntityDamage { get => entityDamage; set => entityDamage = value; }
 
     protected virtual void Start()
     {
@@ -30,7 +30,10 @@ public abstract class Entity : MonoBehaviour
     }
     protected virtual void Update()
     {
-        Movement();
+        if (!isDeath)
+        {
+            Movement();
+        }
     }    
     protected abstract void Movement();
     protected virtual void Defeat()
@@ -43,15 +46,13 @@ public abstract class Entity : MonoBehaviour
     }
     protected virtual void Attack(Entity targetEntity)
     {
-        targetEntity.TakeDamage(damage);
+        targetEntity.TakeDamage(EntityDamage);
     }
-
     protected virtual void TakeDamage(int damageAmount)
     {
         currentLife -= damageAmount;
         if (currentLife < 0) currentLife = 0;
 
-        entityAnimator.Play("Damaged");
         healthChangeEvent.Invoke(currentLife);
 
         if (currentLife <= 0 && !isDeath)

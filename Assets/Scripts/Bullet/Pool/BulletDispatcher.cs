@@ -7,8 +7,11 @@ public class BulletDispatcher : MonoBehaviour
     [SerializeField] private BulletStorage.BulletType selectedBulletType;
     [SerializeField] private BulletStorage bulletStorage;
     [SerializeField] private Transform bulletSpawnerTarget;
+
+    private Player player;
     private void Start()
     {
+        player = GetComponent<Player>();
         bulletStorage.CreatePool(selectedBulletType);
     }
     public void FireBullet()
@@ -17,6 +20,8 @@ public class BulletDispatcher : MonoBehaviour
         if (bullet != null)
         {
             bullet.SetTransformValues(bulletSpawnerTarget);
+            bullet.damageEvent.Clear();
+            bullet.damageEvent += player.AttackEnemy;
         }
     }
 }

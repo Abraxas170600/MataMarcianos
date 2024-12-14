@@ -10,6 +10,9 @@ public class Player : Entity
     private Vector2 maxBounds;
 
     private Vector2 movementInput;
+
+    [SerializeField] private float invulnerabilityDuration = 2f;
+    private bool isInvulnerable = false;
     protected override void Start()
     {
         base.Start();
@@ -25,13 +28,41 @@ public class Player : Entity
     }
     protected override void Update()
     {
-        InputActions();
-        base.Update();
-        Shoot();
+        if (!isDeath)
+        {
+            InputActions();
+            base.Update();
+            if (!isInvulnerable)
+            {
+                Shoot();
+            }
+        }
     }
     protected override void Defeat()
     {
         base.Defeat();
+        GetComponent<CircleCollider2D>().enabled = false;
+    }
+    public void AttackEnemy(Entity enemy)
+    {
+        Attack(enemy);
+    }
+    protected override void TakeDamage(int damageAmount)
+    {
+        if (isInvulnerable) return;
+
+        entityAnimator.Play("Damaged");
+        base.TakeDamage(damageAmount);
+        StartCoroutine(ActivateInvulnerability());
+    }
+
+    private IEnumerator ActivateInvulnerability()
+    {
+        isInvulnerable = true;
+
+        yield return new WaitForSeconds(invulnerabilityDuration);
+
+        isInvulnerable = false;
     }
     private void InputActions()
     {
